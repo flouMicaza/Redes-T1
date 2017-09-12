@@ -5,8 +5,11 @@
 
 #define PORTUDP "2000"
 #define PORTTCP "2001"
+#define BUFFER_LENGTH 1400 //hay que definir que largo vamos a usarrrr
 
-int funcionTCP(void *puerto){
+
+//funcion que lee del tpc y lo escribe en udp
+void* funcionTCP(void *puerto){
 	//////todo esto lo saque de bws.c porque se conecta a traves de tcp
 	nt n, nl;
     int bytes, cnt, packs;
@@ -19,6 +22,7 @@ int funcionTCP(void *puerto){
     cl = *((int *)puerto);
     free(puerto);
 
+    //esto de aqui nose pq lo hace, osea nose pq esto es el fd de destino :/
     strcpy(tmpfilename, "tmpbwXXXXXX");
 
     fd = mkstemp(tmpfilename);
@@ -45,9 +49,8 @@ int funcionTCP(void *puerto){
 
 }
 
-
-//esta funcion la podemos copiar de bws porque es una conexion con un tcp
-int funcionUDP(){
+//funcion que recibe la respuesta del udp y se lo manda al connectTCP
+void* funcionUDP(){
 	s1=connectUDP(2000);
 	s2=connectTCP(2001);
 	while(true){
@@ -57,10 +60,14 @@ int funcionUDP(){
 }
 
 int main(){
+	//nose que se le pone a la parte de server
+	//talvez estas variables tengan que ser globales
+	int sudp = j_socket_udp_connect(server,PORTUDP);
+	int stcp = j_socket_tcp_connect(server,PORTTCP);
 	Dbind(funcionUDP,PORTUDP)
 
-	p1=pthreadcreate(funcionTCP)
-	p2=pthreadcreate(funcionUDP)
+	p1=pthreadcreate(funcionTCP,PORTTCP);
+	p2=pthreadcreate(funcionUDP,PORTUDP);
 
 	//falta enterrar a los thread y cachar cuando hay q enterrarlos
 
