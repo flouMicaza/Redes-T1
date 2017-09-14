@@ -26,7 +26,7 @@ void* funcionTCP(void *puerto);
 //funcion auxiliar que hace Dbind
 //creada para no enrtegar inputs en el thread
 void *DbindAux(){
-	Dbind(funcionTCP,"2000");
+	Dbind(funcionTCP,"2001");
 	return NULL;
 }
 
@@ -74,7 +74,7 @@ void *funcionUDP(){
 
 
 int main(){
-	sudp = j_socket_udp_connect("localhost","2001");
+	sudp = j_socket_udp_connect("localhost","2000");
     if(sudp < 0) {
 	printf("connect UDP failed\n");
        	exit(1);
