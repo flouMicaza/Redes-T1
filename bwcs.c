@@ -15,7 +15,7 @@
 
 struct timeval t0, t1, t2;
 int portTCP;
-char *portUDP="2001";
+char *portUDP="2000";
 int sudp;
 int stcp;
 int rdy=0;
@@ -42,12 +42,20 @@ void *funcionTCP(void *puerto){
 
 	for(bytes=0,packs=0;; bytes+=cnt,packs++) {
 		cnt = Dread(portTCP, buffer, BUFFER_LENGTH);
-		if(bytes == 0)
+		printf("cnt: %d\n", cnt);
+		if(bytes == 0){
 			gettimeofday(&t1, NULL); /* Mejor esperar al primer read para empezar a contar */
 			write(sudp,NULL,0); //primer mensaje a udp
-		if(cnt <= 0) 
+		}
+
+		if(cnt <= 0){
+			write(sudp, NULL, 0);
 			break;
+		}
+
 		write(sudp, buffer, cnt);
+
+		
     }	
 
 	return NULL;
@@ -57,16 +65,17 @@ void *funcionTCP(void *puerto){
 void *funcionUDP(){
 	int bytes, cnt;
 	char buffer[BUFFER_LENGTH];
-
+	
 	for(bytes=0;;bytes+=cnt) {
-		if((cnt=read(sudp, buffer, BUFFER_LENGTH)) <= 0){ //ya no queda nada mas para leer
+		if((cnt=read(sudp, buffer, BUFFER_LENGTH)) <= 0){
+			Dwrite(portTCP, buffer, 0); //ya no queda nada mas para leer
 		    break;
-	        
-	    }
-
-	    Dwrite(portTCP, buffer, cnt); //devolvemos cosas a stcp
-	    
+		}
+		Dwrite(portTCP, buffer, cnt); //devolvemos cosas a stcp
 	}
+
+	
+	
 	//Dwrite(stcp, buffer, 0); //avisa que termino
 	rdy=1;
 	Dclose(stcp);
