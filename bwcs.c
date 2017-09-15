@@ -69,6 +69,8 @@ void *funcionUDP(){
 	}
 	//Dwrite(stcp, buffer, 0); //avisa que termino
 	rdy=1;
+	Dclose(stcp);
+    close(sudp);
 	return NULL;
 }
 
@@ -93,8 +95,7 @@ int main(){
 
 	pthread_join(pid1,NULL);
 	pthread_join(pid2,NULL);
-	Dclose(stcp);
-    close(sudp);
+	
 	return 0;
 
 }
